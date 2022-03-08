@@ -17,6 +17,7 @@ function postRegistro(request,response){
                 error: true,
                 codigo: 200,
                 mensaje: "Usuario no guardado",
+                titulo:"Error al guardar",
                 resultado : "-1"
             }            
         }else{
@@ -24,6 +25,7 @@ function postRegistro(request,response){
                 error: false,
                 codigo: 200,
                 mensaje: `Usuario guardado con la id ${result.insertId}`,
+                titulo:"Guardado",
                 resultado : String(result.insertId)
             } 
         }
@@ -44,18 +46,61 @@ function postLogin(request,response){
                 error: true,
                 codigo: 200,
                 mensaje: "Usuario no encontrado",
+                titulo:"Error al buscar",
+                resultado : "-1"
+            }            
+        }else{
+            if(result.length>0){
+                respuesta = {
+                    error: false,
+                    codigo: 200,
+                    mensaje: "Usuario encontrado",
+                    titulo:"busqueda Ok",
+                    resultado : result
+                } 
+            }else{
+                respuesta = {
+                    error: true,
+                    codigo: 200,
+                    mensaje: "Usuario no encontrado",
+                    titulo:"Error al buscar",
+                    resultado : result
+                } 
+            }
+            
+        }
+        response.send(respuesta);
+    });
+}
+
+function putPerfil(request,response){
+    let temp = request.body;
+    param = [temp.nombre,temp.apellidos,temp.correo,temp.url,temp.password,temp.id_usuario];
+    sql = "UPDATE usuario SET nombre = COALESCE(?,nombre),apellidos = COALESCE(?,apellidos), correo = COALESCE(?,correo)" +
+        ", url = COALESCE(?,url), password = COALESCE(?,password) WHERE id_usuario = ?";
+
+    connection.query(sql,param,function(err,result){
+        if(err){
+            console.log(err);
+            respuesta = {
+                error: true,
+                codigo: 200,
+                mensaje: "Usuario no modificado",
+                titulo:"Error al modificar",
                 resultado : "-1"
             }            
         }else{
             respuesta = {
                 error: false,
                 codigo: 200,
-                mensaje: "Usuario encontrado",
+                mensaje: "Usuario modificado",
+                titulo:"Modificado",
                 resultado : result
             } 
         }
         response.send(respuesta);
     });
-}
 
-module.exports = {postRegistro,postLogin}
+}
+ 
+module.exports = {postRegistro,postLogin,putPerfil}

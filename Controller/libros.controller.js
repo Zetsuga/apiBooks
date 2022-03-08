@@ -7,31 +7,34 @@ let respuesta ={};
 
 function getLibros(request,response){
     if(request.query.id_libro ==null){
-        param = [];
-        sql = "SELECT * FROM libro";
+        param = [request.query.id_usuario];
+        sql = "SELECT * FROM libro WHERE id_usuario = ?";
     }else{
-        param = [request.query.id];
-        sql = "SELECT * FROM libro WHERE id_libro = ?";
+        param = [request.query.id_libro,request.query.id_usuario];
+        sql = "SELECT * FROM libro WHERE id_libro = ? AND id_usuario = ?";
     }
 
     connection.query(sql,param,function(err,result){
         if(err){
+            console.log(err)
             respuesta = {
                 error: true,
                 codigo: 200,
                 mensaje: "Libro no encontrado",
+                titulo:"Error al buscar",
                 resultado : "-1"
             }   
         }else{
             respuesta = {
                 error: true,
                 codigo: 200,
-                mensaje: "Libro/s encontrado",
+                mensaje: `Libro/s encontrado/s`,
+                titulo:"Error al buscarBusqueda Ok",
                 resultado : result
             }  
         }
         response.send(respuesta);
-    });
+    })
 }
 
 function postLibros(request,response){
@@ -41,19 +44,22 @@ function postLibros(request,response){
     
     connection.query(sql,[param],function(err,result){
         if(err){
+            console.log(err)
             respuesta = {
                 error: true,
                 codigo: 200,
                 mensaje: "Libro no guardado",
+                titulo:"Error al guardar",
                 resultado : "-1"
             }   
         }else{
             respuesta = {
                 error: true,
                 codigo: 200,
-                mensaje: `Libro guardado ${result.insertId}`,
+                mensaje: `Libro guardado con la referencia: ${result.insertId}`,
+                titulo:"Guardado",
                 resultado : String(result.insertId)
-            }  
+            }
         }
         response.send(respuesta);
     });
@@ -72,13 +78,15 @@ function putLibros(request,response){
                 error: true,
                 codigo: 200,
                 mensaje: "Libro no modificado",
+                titulo:"Error al modificar",
                 resultado : "-1"
             }   
         }else{
             respuesta = {
                 error: true,
                 codigo: 200,
-                mensaje: `Libro modificadp ${result.id_libro}`,
+                mensaje: `Libro modificado ${result.id_libro}`,
+                titulo:"Modificado",
                 resultado : String(result.affectedRows)
             }  
         }
@@ -97,6 +105,7 @@ function delLibros(request,response){
                 error: true,
                 codigo: 200,
                 mensaje: "Libro no eliminado",
+                titulo:"Error al eliminar",
                 resultado : "-1"
             }   
         }else{
@@ -104,6 +113,7 @@ function delLibros(request,response){
                 error: true,
                 codigo: 200,
                 mensaje: `Libro eliminado`,
+                titulo:"Eliminado",
                 resultado : String(result.affectedRows)
             }  
         }
